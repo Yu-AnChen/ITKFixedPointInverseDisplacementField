@@ -1,15 +1,23 @@
 
 name: Build, test, package
 
-on: [push,pull_request]
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  cxx-build-workflow:
-    uses: InsightSoftwareConsortium/ITKRemoteModuleBuildTestPackageAction/.github/workflows/build-test-cxx.yml@v5.4.0
-
   python-build-workflow:
-    uses: InsightSoftwareConsortium/ITKRemoteModuleBuildTestPackageAction/.github/workflows/build-test-package-python.yml@v5.4.0
+    uses: ./.github/workflows/build-test-package-python.yml
     with:
       test-notebooks: false
-    secrets:
-      pypi_password: ${{ secrets.pypi_password }}
+      github-event-name: ${{ github.event_name }}
+      github-ref: ${{ github.ref }}
+
